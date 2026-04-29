@@ -17,7 +17,7 @@ import com.nutech.simsppob.Entitys.User;
  *
  * @author billyyuriaan
  */
-public interface UserRepository extends JpaRepository<Object, Object> {
+public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT * FROM users WHERE email = :email", nativeQuery = true)
     Optional<User> findByEmail(@Param("email") String email);
 }

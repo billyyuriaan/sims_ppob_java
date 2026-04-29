@@ -10,8 +10,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.nutech.simsppob.dto.CommonModelAttribute;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,7 +38,7 @@ import lombok.Setter;
 public class ServiceType {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private int id;
+    private Long id;
 
     @OneToMany(mappedBy="serviceType")
     private List<Service> services;

@@ -5,6 +5,7 @@
 
 package com.nutech.simsppob.Controllers;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nutech.simsppob.Entitys.User;
+import com.nutech.simsppob.Entitys.UserBalance;
 import com.nutech.simsppob.Repositorys.UserRepository;
 import com.nutech.simsppob.Security.JwtUtil;
 import com.nutech.simsppob.dto.ProfileResponse;
@@ -82,10 +84,17 @@ public class MembershipController {
             user.setEmail(request.getEmail());
             user.setFirstName(request.getFirstName());
             user.setLastName(request.getLastName());
+            user.setCreatedAt(LocalDateTime.now());
+            user.setUpdatedAt(LocalDateTime.now());
             
             user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-            userRepository.save(user);
+            User saveUser = userRepository.save(user);
+            UserBalance userBalance = new UserBalance();
+
+            userBalance.setUserId(saveUser.getId());
+            userBalance.setCreatedAt(LocalDateTime.now());
+            userBalance.setUpdatedAt(LocalDateTime.now());
 
             res.put("status", 0);
             res.put("message", "registrasi berhasil silahkan login");

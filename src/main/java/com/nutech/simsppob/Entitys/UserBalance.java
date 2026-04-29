@@ -5,12 +5,17 @@
 
 package com.nutech.simsppob.Entitys;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Component;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,7 +38,15 @@ import lombok.ToString;
 @AllArgsConstructor
 @Table(name="user_balance")
 public class UserBalance {
-    
+    @Id
+    private Long userId;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    private BigDecimal balance;    
 
     @Column(name="created_at", nullable=true)
     public LocalDateTime createdAt;

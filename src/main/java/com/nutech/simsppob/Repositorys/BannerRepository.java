@@ -16,7 +16,7 @@ import com.nutech.simsppob.Entitys.Banner;
  *
  * @author billyyuriaan
  */
-public interface BannerRepository extends JpaRepository<Object, Object>  {
+public interface BannerRepository extends JpaRepository<Banner, Long>  {
     @Query(value="SELECT * FROM banners", nativeQuery=true)
     Optional<Banner> getAllBanner();
 }

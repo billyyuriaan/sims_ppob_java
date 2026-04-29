@@ -5,10 +5,7 @@
 
 package com.nutech.simsppob.Entitys;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-import org.springframework.stereotype.Component;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,27 +28,25 @@ import lombok.ToString;
  */
 @Setter
 @Getter
-@Component
+@Data
 @Entity
 @ToString
-@Table(name="services")
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-public class Service {
+@Table(name="transactions")
+public class Transaction {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
+    @GeneratedValue(strategy=GenerationType.UUID)
+    private String invoiceNumber;
+
     @ManyToOne
-    @JoinColumn(name="service_type_id")
-    private ServiceType serviceType;
+    @JoinColumn(name="transaction_type_id")
+    private TransactionType transactionType;
 
-    private String name;
-
-    private String icon;
-
-    private BigDecimal tarrif;
+    private String description;
 
     @Column(name="created_at", nullable=true)
     public LocalDateTime createdAt;

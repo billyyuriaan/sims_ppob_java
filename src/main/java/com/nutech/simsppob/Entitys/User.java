@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.nutech.simsppob.dto.CommonModelAttribute;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

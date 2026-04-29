@@ -7,7 +7,7 @@ package com.nutech.simsppob.Repositorys;
 
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import  org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.nutech.simsppob.Entitys.Service;
@@ -16,7 +16,7 @@ import com.nutech.simsppob.Entitys.Service;
  *
  * @author iolux
  */
-public interface ServiceRepository extends JpaRepository<Object, Object>{
+public interface ServiceRepository extends JpaRepository<Service, Long>{
     @Query(value="""
             SELECT s.*
             FROM services s

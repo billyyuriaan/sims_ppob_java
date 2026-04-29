@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.nutech.simsppob.dto.CommonModelAttribute;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,7 +40,7 @@ import lombok.ToString;
 public class Banner{
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private int id;
+    private Long id;
 
     @JsonProperty("banner_name")
     private String bannerName;
