@@ -107,14 +107,14 @@ public class MembershipController {
     @PutMapping("/profile/image")
     public ResponseEntity<ResponseJsonFormat> uploadUserProfileImage(
         @RequestParam("file") MultipartFile file,
-        Authentication auth
+        Authentication auth,
+        FileService fileService
     ) {
         ResponseJsonFormat res = new ResponseJsonFormat();
 
         try {
             User user = new UserService().getUserProfileByEmail(auth.getName());
             String contentType = file.getContentType();
-            FileService fileService = new FileService();
 
             if (!"image/jpeg".equals(contentType) && !"image/png".equals(contentType)) {
                 throw new Exception("Format Image tidak sesuai");

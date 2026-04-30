@@ -7,7 +7,6 @@ package com.nutech.simsppob.Services;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,14 +21,17 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
  */
 @Service
 public class FileService {
-    @Autowired
-    private S3Client s3Client;
+    private final S3Client s3Client;
 
     @Value("${railway.s3.endpointurl}")
     private String endpoint;
 
     @Value("${railway.s3.bucketname}")
     private String bucket;
+
+    public FileService(S3Client s3Client){
+        this.s3Client = s3Client;
+    }
 
 
     public String upload(MultipartFile file) throws IOException {

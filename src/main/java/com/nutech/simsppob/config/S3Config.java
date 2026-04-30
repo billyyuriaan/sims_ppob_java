@@ -22,7 +22,7 @@ import software.amazon.awssdk.services.s3.S3Client;
  */
 @Configuration
 public class S3Config {
-    @Value("${railway.s3.access-key}")
+    @Value("${railway.s3.id-key}")
     private String accessKey;
 
     @Value("${railway.s3.secret-key}")
