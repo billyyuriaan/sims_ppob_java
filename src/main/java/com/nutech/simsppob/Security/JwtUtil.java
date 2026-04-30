@@ -23,9 +23,12 @@ public class JwtUtil {
     private static final Key KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     public static String generateToken(String email) {
+        long EXPIRATION_TIME = 1000 * 60 * 60 * 2; // 2 hours
+
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(KEY)
                 .compact();
     }

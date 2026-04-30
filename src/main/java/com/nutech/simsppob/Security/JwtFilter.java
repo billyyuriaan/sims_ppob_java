@@ -11,12 +11,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.nutech.simsppob.Entitys.User;
 import com.nutech.simsppob.Repositorys.UserRepository;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,37 +37,52 @@ public class JwtFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       HttpServletRequest request,
       HttpServletResponse response,
-      FilterChain filterChain) throws ServletException, IOException 
-  {
+      FilterChain filterChain) throws ServletException, IOException {
+
     String path = request.getRequestURI();
 
+    // Skip public endpoints
     if (path.equals("/registration") ||
         path.equals("/login") ||
         path.equals("/banner")) {
-        filterChain.doFilter(request, response);
-        return;
+      filterChain.doFilter(request, response);
+      return;
     }
 
     String header = request.getHeader("Authorization");
 
-    if (header != null && header.startsWith("Bearer ")) {
-      String token = header.substring(7);
+    try {
+      if (header != null && header.startsWith("Bearer ")) {
+        String token = header.substring(7);
 
-      String email = JwtUtil.getUserEmail(token);
+        // This line will throw ExpiredJwtException if expired
+        String email = JwtUtil.getUserEmail(token);
 
-      User user = userRepository.findByEmail(email).orElse(null);
+        User user = userRepository.findByEmail(email).orElse(null);
 
-      if (user != null) {
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-            user,
-            null,
-            List.of());
+        if (user != null) {
+          UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+              user,
+              null,
+              List.of());
 
-        SecurityContextHolder.getContext().setAuthentication(auth);
+          SecurityContextHolder.getContext().setAuthentication(auth);
+        }
       }
+
+      filterChain.doFilter(request, response);
+
+    } catch (ExpiredJwtException e) {
+      response.setContentType("application/json");
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.getWriter().write(
+          "{ \"status\": 401, \"message\": \"Token expired\", \"data\": null }");
+
+    } catch (JwtException | IllegalArgumentException e) {
+      response.setContentType("application/json");
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.getWriter().write(
+          "{ \"status\": 401, \"message\": \"Invalid token\", \"data\": null }");
     }
-
-    filterChain.doFilter(request, response);
   }
-
 }
