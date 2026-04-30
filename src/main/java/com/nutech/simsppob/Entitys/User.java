@@ -54,6 +54,7 @@ public class User {
   private String email;
 
   @JsonProperty("profile_image")
+  @Column(columnDefinition="TEXT")
   private String profileImage;
 
   @Column(name = "created_at", nullable = true)
