@@ -20,19 +20,21 @@ import lombok.Setter;
 @Setter
 @Getter
 public class RegisterRequest {
-    @Email(message="Parameter email tidak sesuai format")
-    @NotBlank(message="Parameter email tidak boleh kosong")
-    private String email;
+  @JsonProperty("email")
+  @Email(message = "Parameter email tidak sesuai format")
+  @NotBlank(message = "Parameter email tidak boleh kosong")
+  private String email;
 
-    @NotBlank(message="Parameter password tidak boleh kosong")
-    @Size(min=8, message="Parameter password minimal 8 karakter")
-    private String password;
+  @JsonProperty("password")
+  @NotBlank(message = "Parameter password tidak boleh kosong")
+  @Size(min = 8, message = "Parameter password minimal 8 karakter")
+  private String password;
 
-    @JsonProperty("first_name")
-    @NotBlank(message="Parameter first_name tidak boleh kosong")
-    private String firstName;
+  @JsonProperty("first_name")
+  @NotBlank(message = "Parameter first_name tidak boleh kosong")
+  private String firstName;
 
-    @JsonProperty("last_name")
-    @NotBlank(message="Parameter last_name tidak boleh kosong")
-    private String lastName;
+  @JsonProperty("last_name")
+  @NotBlank(message = "Parameter last_name tidak boleh kosong")
+  private String lastName;
 }

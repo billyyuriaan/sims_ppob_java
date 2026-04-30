@@ -46,7 +46,7 @@ public class TransactionResponse {
     )
     {
         this.invoiceNumber = transaction.getInvoiceNumber();
-        this.serviceCode = service.getServiceType().getCode();
+        this.serviceCode = service.getCode();
         this.serviceName = service.getName();
         this.transactionType = transaction.getTransactionType();
         this.amount = transaction.getAmount();

@@ -6,19 +6,14 @@
 package com.nutech.simsppob.Controllers;
 
 import java.util.List;
-import java.util.Map;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nutech.simsppob.Repositorys.BannerRepository;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import com.nutech.simsppob.Repositorys.ServiceRepository;
 import com.nutech.simsppob.dto.BannerResponse;
 import com.nutech.simsppob.dto.ResponseJsonFormat;
@@ -39,7 +34,7 @@ public class InformationController {
     private ServiceRepository serviceRepository;
 
     @GetMapping("/banner")
-    public ResponseEntity<ResponseJsonFormat> getAllBanners(@RequestParam String param) {
+    public ResponseEntity<ResponseJsonFormat> getAllBanners() {
         ResponseJsonFormat res = new ResponseJsonFormat();
     
         try {
@@ -64,7 +59,7 @@ public class InformationController {
     }
 
     @GetMapping("/services")
-    public ResponseEntity<ResponseJsonFormat> getAllServices(@RequestParam String param) {
+    public ResponseEntity<ResponseJsonFormat> getAllServices() {
         ResponseJsonFormat res = new ResponseJsonFormat();
 
         try {

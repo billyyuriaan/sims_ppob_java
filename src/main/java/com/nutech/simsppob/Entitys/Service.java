@@ -15,8 +15,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,30 +32,29 @@ import lombok.ToString;
 @Component
 @Entity
 @ToString
-@Table(name="services")
+@Table(name = "services")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class Service {
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
 
-    @ManyToOne
-    @JoinColumn(name="service_type_id")
-    private ServiceType serviceType;
+  @Column(name = "code", unique = true)
+  private String code;
 
-    private String name;
+  private String name;
 
-    private String icon;
+  private String icon;
 
-    private BigDecimal tarrif;
+  private BigDecimal tarrif;
 
-    private String description;
+  private String description;
 
-    @Column(name="created_at", nullable=true)
-    public LocalDateTime createdAt;
+  @Column(name = "created_at", nullable = true)
+  public LocalDateTime createdAt;
 
-    @Column(name="updated_at", nullable=true)
-    public LocalDateTime updatedAt;
+  @Column(name = "updated_at", nullable = true)
+  public LocalDateTime updatedAt;
 }

@@ -36,29 +36,29 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="users")
-public class User{
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
+@Table(name = "users")
+public class User {
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @JsonProperty("first_name")
-    private String firstName;
+  @JsonProperty("first_name")
+  private String firstName;
 
-    @JsonProperty("last_name")
-    private String lastName;
+  @JsonProperty("last_name")
+  private String lastName;
 
-    private String password;
+  private String password;
 
-    @Column(unique=true)
-    private String email;
+  @Column(unique = true)
+  private String email;
 
-    @JsonProperty("profile_image")
-    private String profileImage;
+  @JsonProperty("profile_image")
+  private String profileImage;
 
-    @Column(name="created_at", nullable=true)
-    public LocalDateTime createdAt;
+  @Column(name = "created_at", nullable = true)
+  public LocalDateTime createdAt;
 
-    @Column(name="updated_at", nullable=true)
-    public LocalDateTime updatedAt;
+  @Column(name = "updated_at", nullable = true)
+  public LocalDateTime updatedAt;
 }

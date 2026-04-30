@@ -5,37 +5,38 @@
 
 package com.nutech.simsppob.Security;
 
+import java.security.Key;
 import java.util.Date;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 /**
  *
  * @author iolux
  */
 public class JwtUtil {
-    private static final String SECRET = "programmer-assigment-java";
 
-    public static String generateToken(
-        String email
-    )
-    {
+    // MUST be at least 32 bytes (256 bits)
+    private static final Key KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+    public static String generateToken(String email) {
         return Jwts.builder()
-            .setSubject(email)
-            .setIssuedAt(new Date())
-            .signWith(SignatureAlgorithm.HS256, SECRET)
-            .compact();
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .signWith(KEY)
+                .compact();
     }
 
-    public static String getUserEmail(
-        String token
-    )
-    {
-        return Jwts.parser()
-            .setSigningKey(SECRET)
-            .parseClaimsJws(token)
-            .getBody()
-            .getSubject();
+    public static String getUserEmail(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
     }
 }

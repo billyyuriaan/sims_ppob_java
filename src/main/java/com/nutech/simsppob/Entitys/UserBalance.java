@@ -39,11 +39,11 @@ import lombok.ToString;
 @Table(name="user_balance")
 public class UserBalance {
     @Id
-    private Long userId;
+    private Long id;
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable=false)
     private User user;
 
     private BigDecimal balance;    

@@ -5,7 +5,6 @@
 
 package com.nutech.simsppob.Controllers;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,11 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.nutech.simsppob.Entitys.User;
-import com.nutech.simsppob.Entitys.UserBalance;
 import com.nutech.simsppob.Repositorys.UserRepository;
 import com.nutech.simsppob.Security.JwtUtil;
 import com.nutech.simsppob.Services.FileService;
-import com.nutech.simsppob.Services.UserService;
+import com.nutech.simsppob.Services.UserBalanceService;
+import com.nutech.simsppob.dto.LoginRequest;
 import com.nutech.simsppob.dto.ProfileResponse;
 import com.nutech.simsppob.dto.ProfileUpdateRequest;
 import com.nutech.simsppob.dto.RegisterRequest;
@@ -40,178 +38,171 @@ import jakarta.validation.Valid;
  * @author billyyuriaan
  */
 @RestController
-@Controller
 public class MembershipController {
-    @Autowired
-    private UserRepository userRepository;
+  @Autowired
+  private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
-    @GetMapping("/profile")
-    public ResponseEntity<ResponseJsonFormat> getUserProfile(
-        Authentication auth
-    ) {
-        ResponseJsonFormat res = new ResponseJsonFormat();
+  @Autowired
+  private UserBalanceService userBalanceService;
 
-        try {
-            User user = new UserService().getUserProfileByEmail(auth.getName());
+  @Autowired
+  private FileService fileService;
 
-            res.put("status", 0);
-            res.put("message", "Sukses");
-            res.put("data", new ProfileResponse(user));
+  @GetMapping("/profile")
+  public ResponseEntity<ResponseJsonFormat> getUserProfile(
+      Authentication auth) {
+    ResponseJsonFormat res = new ResponseJsonFormat();
 
-            return ResponseEntity.ok(res);
-        } catch (Exception e) {
-            res.put("status", 108);
-            res.put("message", e.getMessage());
-            res.put("data", null);
+    try {
+      User user = (User) auth.getPrincipal();
 
-            return ResponseEntity.status(401).body(res);
-        }
+      res.put("status", 0);
+      res.put("message", "Sukses");
+      res.put("data", new ProfileResponse(user));
+
+      return ResponseEntity.ok(res);
+    } catch (Exception e) {
+      res.put("status", 108);
+      res.put("message", e.getMessage());
+      res.put("data", null);
+
+      return ResponseEntity.badRequest().body(res);
     }
+  }
 
-    @PutMapping("/profile/update")
-    public ResponseEntity<ResponseJsonFormat> updateUserProfile(
-        @RequestParam("file") ProfileUpdateRequest request,
-        Authentication auth
-    ) {
-        ResponseJsonFormat res = new ResponseJsonFormat();
+  @PutMapping("/profile/update")
+  public ResponseEntity<ResponseJsonFormat> updateUserProfile(
+      @Valid @RequestBody ProfileUpdateRequest request,
+      Authentication auth) {
+    ResponseJsonFormat res = new ResponseJsonFormat();
 
-        try {
-            User user = new UserService().getUserProfileByEmail(auth.getName());
+    try {
+      User user = (User) auth.getPrincipal();
 
-            this.userRepository.updateUserProfileData(
-                user.getId(), 
-                request.getFirstName(), 
-                request.getLastName()
-            );
+      this.userRepository.updateUserProfileData(
+          user.getId(),
+          request.getFirstName(),
+          request.getLastName());
 
-            user.setFirstName(request.getFirstName());
-            user.setLastName(request.getLastName());
+      user.setFirstName(request.getFirstName());
+      user.setLastName(request.getLastName());
 
-            res.put("status", 0);
-            res.put("message", "Update Profile berhasil");
-            res.put("data", new ProfileResponse(user));
+      res.put("status", 0);
+      res.put("message", "Update Profile berhasil");
+      res.put("data", new ProfileResponse(user));
 
-            return ResponseEntity.ok(res);
-        } catch (Exception e) {
-            res.put("status", 102);
-            res.put("message", e.getMessage());
-            res.put("data", null);
+      return ResponseEntity.ok(res);
+    } catch (Exception e) {
+      res.put("status", 102);
+      res.put("message", e.getMessage());
+      res.put("data", null);
 
-            return ResponseEntity.status(401).body(res);
-        }
+      return ResponseEntity.badRequest().body(res);
     }
+  }
 
-    @PutMapping("/profile/image")
-    public ResponseEntity<ResponseJsonFormat> uploadUserProfileImage(
-        @RequestParam("file") MultipartFile file,
-        Authentication auth,
-        FileService fileService
-    ) {
-        ResponseJsonFormat res = new ResponseJsonFormat();
+  @PutMapping("/profile/image")
+  public ResponseEntity<ResponseJsonFormat> uploadUserProfileImage(
+      @RequestParam("file") MultipartFile file,
+      Authentication auth) {
+    ResponseJsonFormat res = new ResponseJsonFormat();
 
-        try {
-            User user = new UserService().getUserProfileByEmail(auth.getName());
-            String contentType = file.getContentType();
+    try {
+      User user = (User) auth.getPrincipal();
+      String contentType = file.getContentType();
 
-            if (!"image/jpeg".equals(contentType) && !"image/png".equals(contentType)) {
-                throw new Exception("Format Image tidak sesuai");
-            }
+      if (!"image/jpeg".equals(contentType) && !"image/png".equals(contentType)) {
+        throw new Exception("Format Image tidak sesuai");
+      }
 
-            String url = fileService.upload(file);
+      String url = this.fileService.upload(file);
 
-            this.userRepository.updateUserProfileImage(user.getId(), url);
+      this.userRepository.updateUserProfileImage(user.getId(), url);
 
-            user.setProfileImage(url);
+      user.setProfileImage(url);
 
-            res.put("status", 0);
-            res.put("message", "Update Profile Image berhasil");
-            res.put("data", new ProfileResponse(user));
+      res.put("status", 0);
+      res.put("message", "Update Profile Image berhasil");
+      res.put("data", new ProfileResponse(user));
 
-            return ResponseEntity.ok(res);
-        } catch (Exception e) {
-            res.put("status", 102);
-            res.put("message", e.getMessage());
-            res.put("data", null);
+      return ResponseEntity.ok(res);
+    } catch (Exception e) {
+      res.put("status", 102);
+      res.put("message", e.getMessage());
+      res.put("data", null);
 
-            return ResponseEntity.status(401).body(res);
-        }
+      return ResponseEntity.badRequest().body(res);
     }
+  }
 
-    @PostMapping("/registration")
-    public ResponseEntity<ResponseJsonFormat> postUserRegistration(
-        @Valid @RequestBody RegisterRequest request
-    ) {
-        ResponseJsonFormat res = new ResponseJsonFormat();
+  @PostMapping("/registration")
+  public ResponseEntity<ResponseJsonFormat> postUserRegistration(
+      @Valid @RequestBody RegisterRequest request) {
+    ResponseJsonFormat res = new ResponseJsonFormat();
 
-        try {
-            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-                throw new Exception("Akun telah ada, silahkan login");
-            }
+    try {
+      if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+        throw new Exception("Akun telah ada, silahkan login");
+      }
 
-            User user = new User();
+      User user = new User();
 
-            user.setEmail(request.getEmail());
-            user.setFirstName(request.getFirstName());
-            user.setLastName(request.getLastName());
-            user.setCreatedAt(LocalDateTime.now());
-            user.setUpdatedAt(LocalDateTime.now());
-            
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
+      user.setEmail(request.getEmail());
+      user.setFirstName(request.getFirstName());
+      user.setLastName(request.getLastName());
+      user.setCreatedAt(LocalDateTime.now());
+      user.setUpdatedAt(LocalDateTime.now());
+      user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-            User saveUser = userRepository.save(user);
-            UserBalance userBalance = new UserBalance();
+      user = this.userRepository.save(user);
 
-            // everytime new user is created, the balance is set to zero
-            userBalance.setUserId(saveUser.getId());
-            userBalance.setBalance(BigDecimal.ZERO);
-            userBalance.setCreatedAt(LocalDateTime.now());
-            userBalance.setUpdatedAt(LocalDateTime.now());
+      this.userBalanceService.initUserBalance(user);
 
-            res.put("status", 0);
-            res.put("message", "registrasi berhasil silahkan login");
-            res.put("data", null);
+      res.put("status", 0);
+      res.put("message", "registrasi berhasil silahkan login");
+      res.put("data", null);
 
+      return ResponseEntity.ok(res);
+    } catch (Exception e) {
+      res.put("status", 102);
+      res.put("message", e.getMessage());
+      res.put("data", null);
 
-            return ResponseEntity.ok(res);
-        } catch (Exception e) {
-            res.put("status", 102);
-            res.put("message", e.getMessage());
-            res.put("data", null);
-
-            return ResponseEntity.badRequest().body(res);
-        }
+      return ResponseEntity.badRequest().body(res);
     }
+  }
 
-    @PostMapping("/login")
-    public ResponseEntity<ResponseJsonFormat> postUserLogin(
-        @Valid @RequestBody RegisterRequest request
-    ) {
-        ResponseJsonFormat res = new ResponseJsonFormat();
+  @PostMapping("/login")
+  public ResponseEntity<ResponseJsonFormat> postUserLogin(
+      @Valid @RequestBody LoginRequest request) {
+    ResponseJsonFormat res = new ResponseJsonFormat();
 
-        try {
-            User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new Exception("username atau password salah"));
+    try {
+      User user = userRepository.findByEmail(request.getEmail())
+          .orElseThrow(() -> new Exception("username atau password salah"));
 
-            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                throw new RuntimeException("Wrong password");
-            }
-            
-            res.put("status", 0);
-            res.put("message", "Login Sukses");
-            res.put("data", new HashMap<>(){{
-                put("token", JwtUtil.generateToken(user.getEmail()));
-            }});
+      if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        throw new RuntimeException("Wrong password");
+      }
 
-            return ResponseEntity.ok(res);
-        } catch (Exception e) {
-            res.put("status", 102);
-            res.put("message", e.getMessage());
-            res.put("data", null);
-
-            return ResponseEntity.badRequest().body(res);
+      res.put("status", 0);
+      res.put("message", "Login Sukses");
+      res.put("data", new HashMap<>() {
+        {
+          put("token", JwtUtil.generateToken(user.getEmail()));
         }
+      });
+
+      return ResponseEntity.ok(res);
+    } catch (Exception e) {
+      res.put("status", 102);
+      res.put("message", e.getMessage());
+      res.put("data", null);
+
+      return ResponseEntity.badRequest().body(res);
     }
+  }
 }

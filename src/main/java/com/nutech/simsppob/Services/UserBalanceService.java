@@ -5,13 +5,16 @@
 
 package com.nutech.simsppob.Services;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.nutech.simsppob.Entitys.Transaction;
 import com.nutech.simsppob.Entitys.User;
 import com.nutech.simsppob.Entitys.UserBalance;
 import com.nutech.simsppob.Repositorys.UserBalanceRepository;
-import com.nutech.simsppob.Repositorys.UserRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -19,23 +22,29 @@ import jakarta.transaction.Transactional;
  *
  * @author iolux
  */
+@Service
 public class UserBalanceService {
     @Autowired
     private UserBalanceRepository userBalanceRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Transactional
+    public void initUserBalance(User user) throws Exception
+    {
+        UserBalance userBalance = new UserBalance();
+
+        // everytime new user is created, the balance is set to zero
+        userBalance.setUser(user);
+        userBalance.setBalance(BigDecimal.ZERO);
+        userBalance.setCreatedAt(LocalDateTime.now());
+        userBalance.setUpdatedAt(LocalDateTime.now());
+
+        this.userBalanceRepository.save(userBalance);
+    }
 
     public UserBalance getUserBalanceByUserEmailFromAuth(
-        String email
+        User user
     ) throws Exception
-    {
-        User user = userRepository.findByEmail(email).orElse(null);
-
-        if (user == null) {
-            throw new Exception("Token tidak valid atau kadarluasa");
-        }
-        
+    {   
         UserBalance balance = this.userBalanceRepository
             .getUserBalanceByUserId(user.getId())
             .orElse(null);
@@ -49,29 +58,29 @@ public class UserBalanceService {
 
     @Transactional
     public void TopUpUserCurrentBalance(
-        String email,
+        User user,
         Transaction transaction
     ) throws Exception
     {
-        UserBalance balance = this.getUserBalanceByUserEmailFromAuth(email);
+        UserBalance balance = this.getUserBalanceByUserEmailFromAuth(user);
 
         this.userBalanceRepository.updateUserBalanceByUserId(
             balance.getBalance().add(transaction.getAmount()),
-            balance.getUserId()
+            balance.getUser().getId()
         );
     }
 
     @Transactional
     public void TransactionUserCurrentBalance(
-        String email,
+        User user,
         Transaction transaction
     ) throws Exception
     {
-        UserBalance balance = this.getUserBalanceByUserEmailFromAuth(email);
+        UserBalance balance = this.getUserBalanceByUserEmailFromAuth(user);
 
         this.userBalanceRepository.updateUserBalanceByUserId(
             balance.getBalance().subtract(transaction.getAmount()),
-            balance.getUserId()
+            balance.getUser().getId()
         );
     }
 }

@@ -13,6 +13,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,28 +34,29 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="transactions")
+@Table(name = "transactions")
 public class Transaction {
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name="user_id")
-    private Long userId;
+  @ManyToOne
+  @JoinColumn(name="user_id", nullable=false)
+  private User user;
 
-    @Column(name="invoice_number")
-    private String invoiceNumber;
+  @Column(name = "invoice_number")
+  private String invoiceNumber;
 
-    @Column(name="transaction_type")
-    private String transactionType;
+  @Column(name = "transaction_type")
+  private String transactionType;
 
-    private String description;
+  private String description;
 
-    private BigDecimal amount;
+  private BigDecimal amount;
 
-    @Column(name="created_at", nullable=true)
-    public LocalDateTime createdAt;
+  @Column(name = "created_at", nullable = true)
+  public LocalDateTime createdAt;
 
-    @Column(name="updated_at", nullable=true)
-    public LocalDateTime updatedAt;
+  @Column(name = "updated_at", nullable = true)
+  public LocalDateTime updatedAt;
 }

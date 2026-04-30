@@ -34,7 +34,7 @@ public class ServiceResponse {
 
     public ServiceResponse(Service service)
     {
-        this.serviceCode = service.getServiceType().getCode();
+        this.serviceCode = service.getCode();
         this.serviceName = service.getName();
         this.serviceIcon = service.getIcon();
         this.serviceTarrif = service.getTarrif();

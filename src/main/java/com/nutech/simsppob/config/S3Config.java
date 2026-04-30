@@ -31,7 +31,7 @@ public class S3Config {
     @Value("${railway.s3.endpointurl}")
     private String endpoint;
 
-    @Value("$${railway.s3.region}")
+    @Value("${railway.s3.region}")
     private String region;
 
     @Bean

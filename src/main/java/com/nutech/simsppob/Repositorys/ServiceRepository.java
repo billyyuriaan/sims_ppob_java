@@ -19,18 +19,9 @@ import com.nutech.simsppob.Entitys.Service;
  * @author iolux
  */
 public interface ServiceRepository extends JpaRepository<Service, Long>{
-    @Query(value="""
-            SELECT s.*
-            FROM services s
-            JOIN service_types as st ON st.id = s.service_type_id
-            """, nativeQuery=true)
+    @Query(value="SELECT * FROM services", nativeQuery=true)
     List<Service> getAllServices();
 
-    @Query(value="""
-            SELECT s.*
-            FROM services s
-            JOIN service_types as st ON st.id = s.service_type_id
-            WHERE st.code = :code
-            """, nativeQuery=true)
+    @Query(value="SELECT * FROM services WHERE code = :code", nativeQuery=true)
     Optional<Service> getServiceDataByCode(@Param("code") String code);
 }

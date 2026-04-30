@@ -5,7 +5,9 @@
 
 package com.nutech.simsppob.Controllers;
 
-import org.apache.tomcat.util.http.parser.Authorization;
+import java.math.BigDecimal;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,9 +25,9 @@ import com.nutech.simsppob.Entitys.UserBalance;
 import com.nutech.simsppob.Repositorys.ServiceRepository;
 import com.nutech.simsppob.Services.TransactionService;
 import com.nutech.simsppob.Services.UserBalanceService;
-import com.nutech.simsppob.Services.UserService;
 import com.nutech.simsppob.dto.ResponseJsonFormat;
 import com.nutech.simsppob.dto.TopUpRequest;
+import com.nutech.simsppob.dto.TranasctionHistoryResponse;
 import com.nutech.simsppob.dto.TransactionHistoryPaginationResponse;
 import com.nutech.simsppob.dto.TransactionRequest;
 import com.nutech.simsppob.dto.TransactionResponse;
@@ -44,7 +46,13 @@ import jakarta.validation.Valid;
 public class TransactionController {
     @Autowired
     private ServiceRepository serviceRepository;
+
+    @Autowired
+    private UserBalanceService userBalanceService;
     
+    @Autowired
+    private TransactionService transactionService;
+
     @GetMapping("/balance")
     public ResponseEntity<ResponseJsonFormat> getUserBalance(
         Authentication auth
@@ -52,8 +60,10 @@ public class TransactionController {
         ResponseJsonFormat res = new ResponseJsonFormat();
 
         try {
-            UserBalance balance = new UserBalanceService()
-                .getUserBalanceByUserEmailFromAuth(auth.getName());
+            User user = (User) auth.getPrincipal();
+
+            UserBalance balance = this.userBalanceService
+                .getUserBalanceByUserEmailFromAuth(user);
 
             res.put("status", 0);
             res.put("message", "Get Balance Berhasil");
@@ -77,16 +87,19 @@ public class TransactionController {
         ResponseJsonFormat res = new ResponseJsonFormat();
 
         try {
-            User user = new UserService().getUserProfileByEmail(auth.getName());
+            User user = (User) auth.getPrincipal();
 
-            Transaction transaction = new TransactionService().makeTopUpTransaction(user, request.getTopUpAmount());
-            new UserBalanceService().TopUpUserCurrentBalance(user.getEmail(), transaction);
+            Transaction transaction = this.transactionService.makeTopUpTransaction(user, request.getTopUpAmount());
+            this.userBalanceService.TopUpUserCurrentBalance(user, transaction);
 
-            UserBalance userBalance = new UserBalanceService().getUserBalanceByUserEmailFromAuth(user.getEmail());
+            UserBalance balance = this.userBalanceService
+                .getUserBalanceByUserEmailFromAuth(user);
+
+            balance.setBalance(balance.getBalance().add(BigDecimal.valueOf(request.getTopUpAmount())));
 
             res.put("status", 0);
             res.put("message", "Top Up Balance Berhasil");
-            res.put("data", new UserBalanceResponse(userBalance));
+            res.put("data", new UserBalanceResponse(balance));
 
             return ResponseEntity.ok(res);
         } catch (Exception e) {
@@ -114,8 +127,9 @@ public class TransactionController {
                 throw new Exception("Service atau layanan tidak ditemukan");
             }
 
-            User user = new UserService().getUserProfileByEmail(auth.getName());
-            Transaction transaction = new TransactionService().makeUserTransaction(user, service);
+            User user = (User) auth.getPrincipal();
+
+            Transaction transaction = this.transactionService.makeUserTransaction(user, service);
 
             res.put("status", 0);
             res.put("message", "Get Balance Berhasil");
@@ -125,14 +139,14 @@ public class TransactionController {
             return ResponseEntity.ok(res);
         } catch (Exception e) {
             res.put("status", 102);
-            res.put("message", "Transaksi Berhasil");
+            res.put("message", e.getMessage());
             res.put("data", null);
             
             return ResponseEntity.badRequest().body(res);
         }
     }
 
-    @PostMapping("/transaction/history")
+    @GetMapping("/transaction/history")
     public ResponseEntity<ResponseJsonFormat> postMethodName(
         @RequestParam(required=false) Integer limit,
         @RequestParam(required=false) Integer offset,
@@ -142,8 +156,12 @@ public class TransactionController {
         TransactionHistoryPaginationResponse data;
 
         try {
-            User user = new UserService().getUserProfileByEmail(auth.getName());
-            data = new TransactionHistoryPaginationResponse(offset, limit, user);
+            User user = (User) auth.getPrincipal();
+
+            List<TranasctionHistoryResponse> records =
+                transactionService.getHistory(user, limit, offset);
+
+            data = new TransactionHistoryPaginationResponse(offset, limit, records);
 
             res.put("status", 0);
             res.put("message", "Get History Berhasil");
