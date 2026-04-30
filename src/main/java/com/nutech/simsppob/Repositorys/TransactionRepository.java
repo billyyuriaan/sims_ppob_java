@@ -17,14 +17,14 @@ import com.nutech.simsppob.Entitys.Transaction;
  * @author iolux
  */
 public interface TransactionRepository extends JpaRepository<Transaction, Long>{
-    @Query(value="SELECT * FROM transactions s WHERE s.user_id = :user_id LIMIT :limit OFFSET :offset", nativeQuery=true)
+    @Query(value="SELECT * FROM transactions WHERE user_id = :userId LIMIT :limit OFFSET :offset", nativeQuery=true)
     List<Transaction> getAllHistoryUserByUserId(
-        @Param("user_id") Long userId,
+        @Param("userId") Long userId,
         @Param("limit") int limit,
         @Param("offset") int offset
     );
-    @Query(value="SELECT * FROM transactions s WHERE s.user_id = :user_id", nativeQuery=true)
+    @Query(value="SELECT * FROM transactions WHERE user_id = :userId", nativeQuery=true)
     List<Transaction> getAllHistoryUserByUserId(
-        @Param("user_id") Long userId
+        @Param("userId") Long userId
     );
 }

@@ -41,7 +41,7 @@ public class Transaction {
     @Column(name="user_id")
     private Long userId;
 
-    @GeneratedValue(strategy=GenerationType.UUID)
+    @Column(name="invoice_number")
     private String invoiceNumber;
 
     @Column(name="transaction_type")

@@ -9,22 +9,27 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.nutech.simsppob.Entitys.UserBalance;
+
+import jakarta.transaction.Transactional;
 
 /**
  *
  * @author iolux
  */
 public interface UserBalanceRepository extends JpaRepository<UserBalance, Long>{
-    @Query(value="SELECT * FROM user_balance WHERE user_id = :user_id", nativeQuery=true)
-    Optional<UserBalance> getUserBalanceByUserId(@Param("user_id") Long userId);
+    @Query(value="SELECT * FROM user_balance WHERE user_id = :userId", nativeQuery=true)
+    Optional<UserBalance> getUserBalanceByUserId(@Param("userId") Long userId);
 
-    @Query(value="UPDATE user_balance u SET u.balance = :balance WHERE u.user_id = :user_id", nativeQuery=true)
+    @Modifying
+    @Transactional
+    @Query(value="UPDATE user_balance SET balance = :balance WHERE user_id = :userId", nativeQuery=true)
     void updateUserBalanceByUserId(
         @Param("balance") BigDecimal balance,
-        @Param("user_id") Long userId
+        @Param("userId") Long userId
     );
 }

@@ -7,6 +7,7 @@ package com.nutech.simsppob.Services;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,6 +32,7 @@ public class TransactionService {
     {
             Transaction transaction = new Transaction();
 
+            transaction.setInvoiceNumber("INV-" + UUID.randomUUID());
             transaction.setTransactionType("TOPUP");
             transaction.setDescription("Top Up Balance");
             transaction.setUserId(user.getId());
@@ -54,6 +56,7 @@ public class TransactionService {
 
         Transaction transaction = new Transaction();
 
+        transaction.setInvoiceNumber("INV-" + UUID.randomUUID());
         transaction.setTransactionType("PAYMENT");
         transaction.setDescription(service.getDescription());
         transaction.setUserId(user.getId());
