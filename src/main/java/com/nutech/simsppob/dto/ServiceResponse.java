@@ -5,16 +5,20 @@
 
 package com.nutech.simsppob.dto;
 
+import java.math.BigDecimal;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nutech.simsppob.Entitys.Service;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author iolux
  */
 @Getter
+@Setter
 public class ServiceResponse {
     @JsonProperty("service_code")
     private String serviceCode;
@@ -26,7 +30,7 @@ public class ServiceResponse {
     private String serviceIcon;
 
     @JsonProperty("service_tariff")
-    private int serviceTarrif;
+    private BigDecimal serviceTarrif;
 
     public ServiceResponse(Service service)
     {

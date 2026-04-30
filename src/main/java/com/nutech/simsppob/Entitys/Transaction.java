@@ -5,6 +5,7 @@
 
 package com.nutech.simsppob.Entitys;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -12,8 +13,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,14 +38,18 @@ public class Transaction {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
+    @Column(name="user_id")
+    private Long userId;
+
     @GeneratedValue(strategy=GenerationType.UUID)
     private String invoiceNumber;
 
-    @ManyToOne
-    @JoinColumn(name="transaction_type_id")
-    private TransactionType transactionType;
+    @Column(name="transaction_type")
+    private String transactionType;
 
     private String description;
+
+    private BigDecimal amount;
 
     @Column(name="created_at", nullable=true)
     public LocalDateTime createdAt;

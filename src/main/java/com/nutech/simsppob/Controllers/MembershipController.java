@@ -5,6 +5,7 @@
 
 package com.nutech.simsppob.Controllers;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
@@ -22,6 +23,7 @@ import com.nutech.simsppob.Entitys.User;
 import com.nutech.simsppob.Entitys.UserBalance;
 import com.nutech.simsppob.Repositorys.UserRepository;
 import com.nutech.simsppob.Security.JwtUtil;
+import com.nutech.simsppob.Services.UserService;
 import com.nutech.simsppob.dto.ProfileResponse;
 import com.nutech.simsppob.dto.RegisterRequest;
 import com.nutech.simsppob.dto.ResponseJsonFormat;
@@ -41,18 +43,14 @@ public class MembershipController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @GetMapping("profile")
+    @GetMapping("/profile")
     public ResponseEntity<ResponseJsonFormat> getUserProfile(
         Authentication auth
     ) {
         ResponseJsonFormat res = new ResponseJsonFormat();
 
         try {
-            User user = userRepository.findByEmail(auth.getName()).orElse(null);
-
-            if (user == null) {
-                throw new Exception("Token tidak valid atau kadarluasa");
-            }
+            User user = new UserService().getUserProfileByEmail(auth.getName());
 
             res.put("status", 0);
             res.put("message", "Sukses");
@@ -92,7 +90,9 @@ public class MembershipController {
             User saveUser = userRepository.save(user);
             UserBalance userBalance = new UserBalance();
 
+            // everytime new user is created, the balance is set to zero
             userBalance.setUserId(saveUser.getId());
+            userBalance.setBalance(BigDecimal.ZERO);
             userBalance.setCreatedAt(LocalDateTime.now());
             userBalance.setUpdatedAt(LocalDateTime.now());
 

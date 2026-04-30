@@ -5,6 +5,7 @@
 
 package com.nutech.simsppob.Repositorys;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,5 +19,5 @@ import com.nutech.simsppob.Entitys.Banner;
  */
 public interface BannerRepository extends JpaRepository<Banner, Long>  {
     @Query(value="SELECT * FROM banners", nativeQuery=true)
-    Optional<Banner> getAllBanner();
+    List<Banner> getAllBanner();
 }

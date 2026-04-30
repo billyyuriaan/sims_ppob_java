@@ -43,6 +43,7 @@ public class ServiceType {
     @OneToMany(mappedBy="serviceType")
     private List<Service> services;
 
+    @Column(unique=true)
     private String code;
 
     @Column(name="created_at", nullable=true)

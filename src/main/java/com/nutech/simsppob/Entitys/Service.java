@@ -53,6 +53,8 @@ public class Service {
 
     private BigDecimal tarrif;
 
+    private String description;
+
     @Column(name="created_at", nullable=true)
     public LocalDateTime createdAt;
 
