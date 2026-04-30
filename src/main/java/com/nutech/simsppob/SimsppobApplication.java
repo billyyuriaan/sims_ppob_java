@@ -6,8 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
 @SpringBootApplication
 public class SimsppobApplication {
 
@@ -32,12 +30,6 @@ public class SimsppobApplication {
     }
 
 	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.configure().load();
-
-		dotenv.entries().forEach(entry ->
-			System.setProperty(entry.getKey(), entry.getValue())
-		);
-		
 		SpringApplication.run(SimsppobApplication.class, args);
 	}
 
