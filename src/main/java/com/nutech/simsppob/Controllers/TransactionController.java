@@ -151,7 +151,7 @@ public class TransactionController {
 
             return ResponseEntity.ok(res);
         } catch (Exception e) {
-            res.put("status", 102);
+            res.put("status", 10);
             res.put("message", e.getMessage());
             res.put("data", null);
             

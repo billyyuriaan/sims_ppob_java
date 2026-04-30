@@ -16,15 +16,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.nutech.simsppob.Entitys.User;
 import com.nutech.simsppob.Entitys.UserBalance;
 import com.nutech.simsppob.Repositorys.UserRepository;
 import com.nutech.simsppob.Security.JwtUtil;
+import com.nutech.simsppob.Services.FileService;
 import com.nutech.simsppob.Services.UserService;
 import com.nutech.simsppob.dto.ProfileResponse;
+import com.nutech.simsppob.dto.ProfileUpdateRequest;
 import com.nutech.simsppob.dto.RegisterRequest;
 import com.nutech.simsppob.dto.ResponseJsonFormat;
 
@@ -59,6 +64,75 @@ public class MembershipController {
             return ResponseEntity.ok(res);
         } catch (Exception e) {
             res.put("status", 108);
+            res.put("message", e.getMessage());
+            res.put("data", null);
+
+            return ResponseEntity.status(401).body(res);
+        }
+    }
+
+    @PutMapping("/profile/update")
+    public ResponseEntity<ResponseJsonFormat> updateUserProfile(
+        @RequestParam("file") ProfileUpdateRequest request,
+        Authentication auth
+    ) {
+        ResponseJsonFormat res = new ResponseJsonFormat();
+
+        try {
+            User user = new UserService().getUserProfileByEmail(auth.getName());
+
+            this.userRepository.updateUserProfileData(
+                user.getId(), 
+                request.getFirstName(), 
+                request.getLastName()
+            );
+
+            user.setFirstName(request.getFirstName());
+            user.setLastName(request.getLastName());
+
+            res.put("status", 0);
+            res.put("message", "Update Profile berhasil");
+            res.put("data", new ProfileResponse(user));
+
+            return ResponseEntity.ok(res);
+        } catch (Exception e) {
+            res.put("status", 102);
+            res.put("message", e.getMessage());
+            res.put("data", null);
+
+            return ResponseEntity.status(401).body(res);
+        }
+    }
+
+    @PutMapping("/profile/image")
+    public ResponseEntity<ResponseJsonFormat> uploadUserProfileImage(
+        @RequestParam("file") MultipartFile file,
+        Authentication auth
+    ) {
+        ResponseJsonFormat res = new ResponseJsonFormat();
+
+        try {
+            User user = new UserService().getUserProfileByEmail(auth.getName());
+            String contentType = file.getContentType();
+            FileService fileService = new FileService();
+
+            if (!"image/jpeg".equals(contentType) && !"image/png".equals(contentType)) {
+                throw new Exception("Format Image tidak sesuai");
+            }
+
+            String url = fileService.upload(file);
+
+            this.userRepository.updateUserProfileImage(user.getId(), url);
+
+            user.setProfileImage(url);
+
+            res.put("status", 0);
+            res.put("message", "Update Profile Image berhasil");
+            res.put("data", new ProfileResponse(user));
+
+            return ResponseEntity.ok(res);
+        } catch (Exception e) {
+            res.put("status", 102);
             res.put("message", e.getMessage());
             res.put("data", null);
 
