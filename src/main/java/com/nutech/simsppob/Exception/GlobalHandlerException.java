@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.nutech.simsppob.dto.ResponseJsonFormat;
 
@@ -33,6 +34,20 @@ public class GlobalHandlerException {
         ResponseJsonFormat response = new ResponseJsonFormat();
         response.put("status", 102);
         response.put("message", message);
+        response.put("data", null);
+
+        return response;
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseJsonFormat handleNoRouteFound(
+        NoHandlerFoundException ex
+    )
+    {
+        ResponseJsonFormat response = new ResponseJsonFormat();
+        response.put("status", 102);
+        response.put("message", "Route API Not Found");
         response.put("data", null);
 
         return response;
